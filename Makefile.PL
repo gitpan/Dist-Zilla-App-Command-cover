@@ -2,45 +2,56 @@
 use strict;
 use warnings;
 
- BEGIN { require 5.008; } 
+use 5.008;
 
-use ExtUtils::MakeMaker 6.31;
+use ExtUtils::MakeMaker 6.30;
 
 
 
 my %WriteMakefileArgs = (
-                       'test' => {
-                                   'TESTS' => 't/*.t'
-                                 },
-                       'NAME' => 'Dist::Zilla::App::Command::cover',
-                       'DISTNAME' => 'Dist-Zilla-App-Command-cover',
-                       'CONFIGURE_REQUIRES' => {
-                                                 'ExtUtils::MakeMaker' => '6.31'
-                                               },
-                       'AUTHOR' => 'Marcel Gruenauer <marcel@cpan.org>',
-                       'BUILD_REQUIRES' => {
-                                             'Test::More' => '0.94',
-                                             'Scalar::Util' => '0',
-                                             'English' => '0',
-                                             'File::Find' => '0',
-                                             'Carp' => '0'
-                                           },
-                       'ABSTRACT' => 'Code coverage metrics for your distribution',
-                       'EXE_FILES' => [],
-                       'VERSION' => '1.101000',
-                       'PREREQ_PM' => {
-                                        'Dist::Zilla::App' => '0',
-                                        'File::Temp' => '0',
-                                        'Path::Class' => '0',
-                                        'File::chdir' => '0',
-                                        'Devel::Cover' => '0'
-                                      },
-                       'LICENSE' => 'perl'
-                     );
+  "ABSTRACT" => "Code coverage metrics for your distribution",
+  "AUTHOR" => "Marcel Gr\303\274nauer <marcel\@cpan.org>, Mike Doherty <doherty\@cpan.org>",
+  "BUILD_REQUIRES" => {
+    "File::Find" => 0,
+    "Module::Build" => "0.3601",
+    "Test::More" => 0
+  },
+  "CONFIGURE_REQUIRES" => {
+    "ExtUtils::MakeMaker" => "6.30",
+    "Module::Build" => "0.3601"
+  },
+  "DISTNAME" => "Dist-Zilla-App-Command-cover",
+  "EXE_FILES" => [],
+  "LICENSE" => "perl",
+  "NAME" => "Dist::Zilla::App::Command::cover",
+  "PREREQ_PM" => {
+    "Devel::Cover" => 0,
+    "Dist::Zilla::App" => 0,
+    "File::Temp" => 0,
+    "File::chdir" => 0,
+    "Path::Class" => 0,
+    "strict" => 0,
+    "warnings" => 0
+  },
+  "VERSION" => "1.101001",
+  "test" => {
+    "TESTS" => "t/*.t"
+  }
+);
 
 
-delete $WriteMakefileArgs{BUILD_REQUIRES}
-  unless eval { ExtUtils::MakeMaker->VERSION(6.56) };
+unless ( eval { ExtUtils::MakeMaker->VERSION(6.56) } ) {
+  my $br = delete $WriteMakefileArgs{BUILD_REQUIRES};
+  my $pp = $WriteMakefileArgs{PREREQ_PM};
+  for my $mod ( keys %$br ) {
+    if ( exists $pp->{$mod} ) {
+      $pp->{$mod} = $br->{$mod} if $br->{$mod} > $pp->{$mod};
+    }
+    else {
+      $pp->{$mod} = $br->{$mod};
+    }
+  }
+}
 
 delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
